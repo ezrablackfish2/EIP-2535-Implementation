@@ -68,6 +68,19 @@ describe('DiamondTest', async function () {
   })
 
   
+  
+it('Should fail: check if Ezra facet is available', async () => {
+    const Ezra = await ethers.getContractAt('Ezra', diamondAddress);
+    
+    let errorOccurred = false;
+    try {
+        await Ezra.ezra1();
+    } catch (error) {
+        errorOccurred = true;
+    }
+    
+    assert(errorOccurred, "Expected function call to fail but it succeeded.");
+});
 
   
  
@@ -94,6 +107,10 @@ describe('DiamondTest', async function () {
     assert.equal(ezra.address, addresses[3]);
  
   })
+  it('check if Ezra facet is available', async () => {
+    const Ezra = await ethers.getContractAt('Ezra', diamondAddress)
+    await Ezra.ezra1();
+  })
    
 
   it('should test ezra function call', async () => {
@@ -103,6 +120,8 @@ describe('DiamondTest', async function () {
   it('should have four facets', async () => {
     assert.equal(addresses.length, 4)
   })
+
+  
 
   it('should replace ezra5 function', async () => {
   const Ezra = await ethers.getContractFactory('Ezra');
@@ -133,7 +152,19 @@ describe('DiamondTest', async function () {
   assert.sameMembers(result, selectors);
   assert.equal(addresses[4], ezraAddress);
 });
-  
+ 
+  it('Should fail: check if ezra4() function is available', async () => {
+    const Ezra = await ethers.getContractAt('Ezra', diamondAddress);
+    
+    let errorOccurred = false;
+    try {
+        await Ezra.ezra4();
+    } catch (error) {
+        errorOccurred = true;
+    }
+    
+    assert(errorOccurred, "Expected function call to fail but it succeeded.");
+});
   
 it('should add ezra4 function', async () => {
   const Ezra = await ethers.getContractFactory('Ezra');
@@ -164,9 +195,9 @@ it('should add ezra4 function', async () => {
   assert.sameMembers(result, selectors);
   assert.equal(addresses[4], ezraAddress);
 });
-  it('check if ezra1() can be called before', async () => {
+  it('check if ezra4() can be called before', async () => {
     const Ezra = await ethers.getContractAt('Ezra', diamondAddress)
-    await Ezra.ezra1()
+    await Ezra.ezra4()
   })
 
   it('should remove some ezra4 functions', async () => {
@@ -188,10 +219,18 @@ it('should add ezra4 function', async () => {
     assert.sameMembers(result, getSelectors(test1Facet).get(functionsToKeep))
   })
   
-  it('check if ezra4() can be called', async () => {
-    const Ezra = await ethers.getContractAt('Ezra', diamondAddress)
-    await Ezra.ezra4()
-  })
+  it('Should fail: check if ezra1() function is available', async () => {
+    const Ezra = await ethers.getContractAt('Ezra', diamondAddress);
+    
+    let errorOccurred = false;
+    try {
+        await Ezra.ezra1();
+    } catch (error) {
+        errorOccurred = true;
+    }
+    
+    assert(errorOccurred, "Expected function call to fail but it succeeded.");
+});
   
   
 
