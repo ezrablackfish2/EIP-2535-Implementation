@@ -69,54 +69,10 @@ describe('DiamondTest', async function () {
 
   
 
-  it('should add test1 functions', async () => {
-    const Test1Facet = await ethers.getContractFactory('Test1Facet')
-    const test1Facet = await Test1Facet.deploy()
-    await test1Facet.deployed()
-    addresses.push(test1Facet.address)
-    const selectors = getSelectors(test1Facet).remove(['supportsInterface(bytes4)'])
-    tx = await diamondCutFacet.diamondCut(
-      [{
-        facetAddress: test1Facet.address,
-        action: FacetCutAction.Add,
-        functionSelectors: selectors
-      }],
-      ethers.constants.AddressZero, '0x', { gasLimit: 800000 })
-    receipt = await tx.wait()
-    if (!receipt.status) {
-      throw Error(`Diamond upgrade failed: ${tx.hash}`)
-    }
-    result = await diamondLoupeFacet.facetFunctionSelectors(test1Facet.address)
-    assert.sameMembers(result, selectors)
-  })
-
-  it('should test function call', async () => {
-    const test1Facet = await ethers.getContractAt('Test1Facet', diamondAddress)
-    await test1Facet.test1Func10()
-  })
-
-  it('should replace supportsInterface function', async () => {
-    const Test1Facet = await ethers.getContractFactory('Test1Facet')
-    const selectors = getSelectors(Test1Facet).get(['supportsInterface(bytes4)'])
-    const testFacetAddress = addresses[3]
-    tx = await diamondCutFacet.diamondCut(
-      [{
-        facetAddress: testFacetAddress,
-        action: FacetCutAction.Replace,
-        functionSelectors: selectors
-      }],
-      ethers.constants.AddressZero, '0x', { gasLimit: 800000 })
-    receipt = await tx.wait()
-    if (!receipt.status) {
-      throw Error(`Diamond upgrade failed: ${tx.hash}`)
-    }
-    result = await diamondLoupeFacet.facetFunctionSelectors(testFacetAddress)
-    assert.sameMembers(result, getSelectors(Test1Facet))
-  })
-
+  
  
 
-  it('should add ezra functions', async () => {
+  it('should add the facet Ezra and its functions', async () => {
     const Ezra = await ethers.getContractFactory('Ezra')
     const ezra = await Ezra.deploy()
     await ezra.deployed()
@@ -135,7 +91,7 @@ describe('DiamondTest', async function () {
     }
     result = await diamondLoupeFacet.facetFunctionSelectors(ezra.address)
     assert.sameMembers(result, selectors)
-    assert.equal(ezra.address, addresses[4]);
+    assert.equal(ezra.address, addresses[3]);
  
   })
    
@@ -144,12 +100,11 @@ describe('DiamondTest', async function () {
     const ezra = await ethers.getContractAt('Ezra', diamondAddress)
     await ezra.ezra5()
   })
-  it('should have three facets -- call to facetAddresses function', async () => {
-    assert.equal(addresses.length, 5)
+  it('should have four facets', async () => {
+    assert.equal(addresses.length, 4)
   })
 
-  
-it('should replace ezra5 function', async () => {
+  it('should replace ezra5 function', async () => {
   const Ezra = await ethers.getContractFactory('Ezra');
   
   const ezra = await Ezra.deploy();
@@ -158,10 +113,11 @@ it('should replace ezra5 function', async () => {
   const selectors = getSelectors(Ezra).get(['ezra5']);
   
   const ezraAddress = ezra.address;
+  addresses[4] = ezra.address;
   
   tx = await diamondCutFacet.diamondCut(
     [{
-      facetAddress: ezraAddress,
+      facetAddress: addresses[4],
       action: FacetCutAction.Replace,
       functionSelectors: selectors
     }],
@@ -175,10 +131,69 @@ it('should replace ezra5 function', async () => {
   
   result = await diamondLoupeFacet.facetFunctionSelectors(ezraAddress);
   assert.sameMembers(result, selectors);
+  assert.equal(addresses[4], ezraAddress);
 });
+  
+  
+it('should add ezra4 function', async () => {
+  const Ezra = await ethers.getContractFactory('Ezra');
+  
+  const ezra = await Ezra.deploy();
+  await ezra.deployed();
+  
+  const selectors = getSelectors(Ezra).get(['ezra4']);
+  
+  const ezraAddress = ezra.address;
+  addresses[4] = ezra.address;
+  
+  tx = await diamondCutFacet.diamondCut(
+    [{
+      facetAddress: addresses[4],
+      action: FacetCutAction.Add,
+      functionSelectors: selectors
+    }],
+    ethers.constants.AddressZero, '0x', { gasLimit: 800000 }
+  );
+  
+  receipt = await tx.wait();
+  if (!receipt.status) {
+    throw Error(`Diamond upgrade failed: ${tx.hash}`);
+  }
+  
+  result = await diamondLoupeFacet.facetFunctionSelectors(ezraAddress);
+  assert.sameMembers(result, selectors);
+  assert.equal(addresses[4], ezraAddress);
+});
+  it('check if ezra1() can be called before', async () => {
+    const Ezra = await ethers.getContractAt('Ezra', diamondAddress)
+    await Ezra.ezra1()
+  })
 
-
- 
+  it('should remove some ezra4 functions', async () => {
+    const test1Facet = await ethers.getContractAt('Ezra', diamondAddress)
+    const functionsToKeep = ['ezra4()']
+    const selectors = getSelectors(test1Facet).remove(functionsToKeep)
+    tx = await diamondCutFacet.diamondCut(
+      [{
+        facetAddress: ethers.constants.AddressZero,
+        action: FacetCutAction.Remove,
+        functionSelectors: selectors
+      }],
+      ethers.constants.AddressZero, '0x', { gasLimit: 800000 })
+    receipt = await tx.wait()
+    if (!receipt.status) {
+      throw Error(`Diamond upgrade failed: ${tx.hash}`)
+    }
+    result = await diamondLoupeFacet.facetFunctionSelectors(addresses[4])
+    assert.sameMembers(result, getSelectors(test1Facet).get(functionsToKeep))
+  })
+  
+  it('check if ezra4() can be called', async () => {
+    const Ezra = await ethers.getContractAt('Ezra', diamondAddress)
+    await Ezra.ezra4()
+  })
+  
+  
 
   
 })
