@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
 
-
-
-contract Ezra {
+contract Ezra2 {
     function ezra1() external {}
 
     function ezra2() external {}
@@ -14,6 +12,6 @@ contract Ezra {
 
     function ezra5() external {}
 
+    function supportsInterface(bytes4 _interfaceID) external view returns (bool) {}
 
-    
 }
